@@ -3,10 +3,12 @@ from random import *
 from flask_cors import CORS
 import requests
 
+
 app = Flask(__name__,
             static_folder = "./dist/static",
             template_folder = "./dist")
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 
 @app.route('/api/random')
 def random_number():
@@ -15,9 +17,20 @@ def random_number():
     }
     return jsonify(response)
 
+@app.route('/api/bigrandom')
+def big_random_number():
+    response = {
+        'bigRandomNumber': randint(1, 100000)
+    }
+    app.logger.debug(response)
+    return jsonify(response)
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
     if app.debug:
         return requests.get('http://localhost:8080/{}'.format(path)).text
     return render_template("index.html")
+
+if __name__ == '__main__':
+    Flask.run(app, debug=True)
